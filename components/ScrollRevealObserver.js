@@ -33,6 +33,13 @@ export default function ScrollRevealObserver() {
         } else {
           // Reset when element leaves the screen so it re-animates both scrolling up and down
           if (rect.top > windowHeight || rect.bottom < 0) {
+            // FAQ: chỉ card ĐANG MỞ mới giữ reveal để đáp án ra ngay.
+            // Card đóng vẫn reset bình thường để giữ hiệu ứng lướt xuất hiện.
+            if (
+              el.getAttribute("data-reveal") === "faq-card" &&
+              el.getAttribute("data-faq-open") === "true"
+            )
+              return;
             el.classList.remove("is-revealed");
           }
         }

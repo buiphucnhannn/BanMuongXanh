@@ -12,6 +12,13 @@ export default function FAQ({ onOpenConsultation }) {
     setOpenFaqs((prev) =>
       prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
     );
+    // Fix mobile: mở/đóng accordion làm đổi chiều cao layout nhưng không bắn sự kiện
+    // scroll, nên observer không tính lại và nội dung phải đợi scroll tiếp mới hiện.
+    // Chủ động báo observer tính lại sau khi layout đổi, không đụng tới giao diện/hiệu ứng.
+    if (typeof window !== "undefined") {
+      requestAnimationFrame(() => window.dispatchEvent(new Event("scroll")));
+      setTimeout(() => window.dispatchEvent(new Event("scroll")), 350);
+    }
   };
 
   // 6 câu hỏi chia đều 2 cột với độ dài câu trả lời đồng đều (~3 dòng)
@@ -122,6 +129,7 @@ export default function FAQ({ onOpenConsultation }) {
                   key={faq.id}
                   data-reveal="faq-card"
                   data-reveal-delay={idx * 80}
+                  data-faq-open={isOpen ? "true" : "false"}
                   className={`rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
                     isOpen
                       ? "bg-white shadow-[0_8px_25px_rgba(26,110,67,0.08)] border-[#1A6E43]/40 ring-1 ring-[#1A6E43]/15"
@@ -163,7 +171,7 @@ export default function FAQ({ onOpenConsultation }) {
                         : "grid-rows-[0fr] opacity-0"
                     }`}
                   >
-                    <div className="overflow-hidden">
+                    <div className="overflow-hidden min-h-0">
                       <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-1.5 border-t border-[#F0EAE1]/80">
                         <div className="min-h-[96px] sm:min-h-[88px] flex items-center text-xs sm:text-[13.5px] text-[#4E5E51] leading-relaxed font-normal">
                           {faq.a}
@@ -185,6 +193,7 @@ export default function FAQ({ onOpenConsultation }) {
                   key={faq.id}
                   data-reveal="faq-card"
                   data-reveal-delay={idx * 80 + 40}
+                  data-faq-open={isOpen ? "true" : "false"}
                   className={`rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
                     isOpen
                       ? "bg-white shadow-[0_8px_25px_rgba(26,110,67,0.08)] border-[#1A6E43]/40 ring-1 ring-[#1A6E43]/15"
@@ -226,7 +235,7 @@ export default function FAQ({ onOpenConsultation }) {
                         : "grid-rows-[0fr] opacity-0"
                     }`}
                   >
-                    <div className="overflow-hidden">
+                    <div className="overflow-hidden min-h-0">
                       <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-1.5 border-t border-[#F0EAE1]/80">
                         <div className="min-h-[96px] sm:min-h-[88px] flex items-center text-xs sm:text-[13.5px] text-[#4E5E51] leading-relaxed font-normal">
                           {faq.a}
