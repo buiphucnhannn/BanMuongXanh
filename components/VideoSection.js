@@ -29,54 +29,107 @@ export default function VideoSection() {
     return () => observer.disconnect();
   }, []);
 
+  const playerRef = useRef(null);
   const unmutedRef = useRef(false);
 
-  // Tự động mở tiếng khi người dùng cuộn tới video hoặc có tương tác đầu tiên
+  // Tối ưu toàn diện: Vừa giữ 100% thanh điều khiển YouTube vừa tự động phát và unmute khi cuộn tới
   useEffect(() => {
     if (!hasScrolledIntoView) return;
 
-    const tryUnmute = () => {
+    let isMounted = true;
+    let pollInterval = null;
+
+    const doUnmute = (player) => {
       if (unmutedRef.current) return;
       try {
-        const win = iframeRef.current?.contentWindow;
-        if (!win) return;
-        win.postMessage(JSON.stringify({ event: "command", func: "unMute", args: [] }), "*");
-        win.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [100] }), "*");
-        unmutedRef.current = true;
+        const p = player || playerRef.current;
+        if (p && typeof p.unMute === "function") {
+          p.unMute();
+          p.setVolume(100);
+          unmutedRef.current = true;
+        } else {
+          const win = iframeRef.current?.contentWindow;
+          if (win) {
+            win.postMessage(JSON.stringify({ event: "command", func: "unMute", args: [] }), "*");
+            win.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [100] }), "*");
+          }
+        }
       } catch (err) {}
     };
 
-    // Thử gửi lệnh mở tiếng theo các khoảng thời gian tải iframe
-    const timers = [
-      setTimeout(tryUnmute, 200),
-      setTimeout(tryUnmute, 600),
-      setTimeout(tryUnmute, 1200),
-      setTimeout(tryUnmute, 2200),
-    ];
-
-    // Lắng nghe tương tác đầu tiên (cuộn, chạm, click) để kích hoạt âm thanh mà không can thiệp nút dừng/tua của video
-    const handleFirstTouch = () => {
-      tryUnmute();
-      cleanup();
+    const initYT = () => {
+      if (!isMounted || !iframeRef.current || !window.YT || !window.YT.Player) return;
+      try {
+        if (!playerRef.current) {
+          playerRef.current = new window.YT.Player(iframeRef.current, {
+            events: {
+              onReady: (event) => {
+                if (!isMounted) return;
+                event.target.playVideo();
+                doUnmute(event.target);
+              },
+              onStateChange: (event) => {
+                // Nếu trình duyệt nghiêm ngặt chặn âm thanh khiến video pause, tiếp tục phát
+                if (event.data === window.YT.PlayerState.PAUSED && !unmutedRef.current) {
+                  try {
+                    event.target.mute();
+                    event.target.playVideo();
+                  } catch (e) {}
+                }
+              },
+            },
+          });
+        }
+      } catch (e) {}
     };
 
-    const cleanup = () => {
-      window.removeEventListener("scroll", handleFirstTouch);
-      window.removeEventListener("wheel", handleFirstTouch);
-      window.removeEventListener("touchstart", handleFirstTouch);
-      window.removeEventListener("pointerdown", handleFirstTouch);
-      window.removeEventListener("click", handleFirstTouch);
+    // Nạp script YouTube API nếu chưa có
+    if (!window.YT) {
+      if (!document.getElementById("yt-iframe-sdk")) {
+        const tag = document.createElement("script");
+        tag.id = "yt-iframe-sdk";
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.body.appendChild(tag);
+      }
+
+      pollInterval = setInterval(() => {
+        if (window.YT && window.YT.Player) {
+          clearInterval(pollInterval);
+          initYT();
+        }
+      }, 80);
+    } else {
+      initYT();
+    }
+
+    // Thử mở tiếng sau khi iframe vừa mount
+    const t1 = setTimeout(() => doUnmute(), 500);
+    const t2 = setTimeout(() => doUnmute(), 1200);
+
+    // Bắt đúng nhịp cuộn (scroll/wheel) hoặc chạm của người dùng để mở âm thanh (mỗi sự kiện chỉ chạy 1 lần duy nhất, tuyệt đối không spam)
+    const onUserInteraction = () => {
+      doUnmute();
+      cleanupListeners();
     };
 
-    window.addEventListener("scroll", handleFirstTouch, { passive: true, once: true });
-    window.addEventListener("wheel", handleFirstTouch, { passive: true, once: true });
-    window.addEventListener("touchstart", handleFirstTouch, { passive: true, once: true });
-    window.addEventListener("pointerdown", handleFirstTouch, { passive: true, once: true });
-    window.addEventListener("click", handleFirstTouch, { once: true });
+    const cleanupListeners = () => {
+      window.removeEventListener("scroll", onUserInteraction);
+      window.removeEventListener("wheel", onUserInteraction);
+      window.removeEventListener("touchstart", onUserInteraction);
+      window.removeEventListener("click", onUserInteraction);
+    };
+
+    window.addEventListener("scroll", onUserInteraction, { passive: true, once: true });
+    window.addEventListener("wheel", onUserInteraction, { passive: true, once: true });
+    window.addEventListener("touchstart", onUserInteraction, { passive: true, once: true });
+    window.addEventListener("click", onUserInteraction, { once: true });
 
     return () => {
-      timers.forEach((t) => clearTimeout(t));
-      cleanup();
+      isMounted = false;
+      clearTimeout(t1);
+      clearTimeout(t2);
+      if (pollInterval) clearInterval(pollInterval);
+      cleanupListeners();
     };
   }, [hasScrolledIntoView]);
 
@@ -156,18 +209,6 @@ export default function VideoSection() {
                 title="Welcome to Bản Mường Xanh"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
-                onLoad={() => {
-                  try {
-                    iframeRef.current?.contentWindow?.postMessage(
-                      JSON.stringify({ event: "command", func: "unMute", args: [] }),
-                      "*"
-                    );
-                    iframeRef.current?.contentWindow?.postMessage(
-                      JSON.stringify({ event: "command", func: "setVolume", args: [100] }),
-                      "*"
-                    );
-                  } catch (e) {}
-                }}
                 className="w-full h-full border-0 block"
               />
             </div>
