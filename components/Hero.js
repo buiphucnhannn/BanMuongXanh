@@ -89,30 +89,30 @@ export default function Hero({ onOpenVideo, onOpenConsultation }) {
 
       {/* Main Content Container: Slightly scaled narrower for comfortable side margins */}
       <div className="relative z-20 max-w-[1480px] w-full mx-auto px-4 sm:px-10 md:px-16 lg:px-24 pt-8 sm:pt-10 -translate-y-4 sm:-translate-y-6 lg:-translate-y-8">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-between">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-items-center lg:justify-items-start justify-center lg:justify-between">
           {/* Left Column: Headings & Call to Actions */}
-          <div data-reveal="hero-text" className="lg:col-span-8 xl:col-span-9 text-white space-y-3.5 sm:space-y-5">
+          <div data-reveal="hero-text" className="lg:col-span-8 xl:col-span-9 text-white space-y-3.5 sm:space-y-5 text-center lg:text-left flex flex-col items-center justify-center lg:items-start lg:justify-start w-full mx-auto">
             {/* Calligraphic Script Accent */}
-            <div className="inline-block transform -rotate-1 origin-left">
+            <div className="w-full flex justify-center lg:justify-start transform -rotate-1 origin-center lg:origin-left">
               <span className="font-script text-xl sm:text-3xl lg:text-4xl xl:text-5xl text-[#EEDFC6] drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] tracking-wide">
                 Rời phố, tìm về
               </span>
             </div>
 
             {/* Majestic Single-Line Title */}
-            <div>
-              <h1 className="font-serif font-black text-[27px] xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[76px] 2xl:text-[84px] tracking-tight leading-none text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] whitespace-nowrap">
+            <div className="w-full flex justify-center lg:justify-start">
+              <h1 className="font-serif font-black text-[27px] xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[76px] 2xl:text-[84px] tracking-tight leading-none text-white text-center lg:text-left drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] whitespace-nowrap">
                 BẢN MƯỜNG XANH
               </h1>
             </div>
 
             {/* Subtitle with bullet dots - Refined smaller size */}
-            <p className="text-white/90 text-[10px] sm:text-xs md:text-sm lg:text-[13.5px] font-medium tracking-[0.14em] sm:tracking-[0.24em] uppercase pt-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] whitespace-nowrap overflow-hidden text-ellipsis">
+            <p className="w-full text-center lg:text-left text-white/90 text-[10px] sm:text-xs md:text-sm lg:text-[13.5px] font-medium tracking-[0.14em] sm:tracking-[0.24em] uppercase pt-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] whitespace-nowrap overflow-hidden text-ellipsis">
               Thiên nhiên <span className="text-[#52B788] mx-1 sm:mx-2 drop-shadow-[0_0_6px_rgba(82,183,136,0.6)]">•</span> Trải nghiệm <span className="text-[#52B788] mx-1 sm:mx-2 drop-shadow-[0_0_6px_rgba(82,183,136,0.6)]">•</span> Kết nối
             </p>
 
             {/* Action Button: Harmonic Forest Emerald Tone matching nature background */}
-            <div className="pt-2 sm:pt-4">
+            <div className="pt-2 sm:pt-4 flex justify-center lg:justify-start w-full">
               <button
                 type="button"
                 onClick={() => onOpenConsultation?.()}
