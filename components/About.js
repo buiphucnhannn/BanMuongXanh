@@ -71,7 +71,7 @@ export default function About({ onOpenLightbox }) {
       </div>
 
       {/* Main Content Container: Slightly narrower width (1380px) for tight, cohesive balance */}
-      <div className="relative z-10 max-w-[1380px] mx-auto px-4 sm:px-8 md:px-10 lg:px-12 pt-10 sm:pt-16 lg:pt-20">
+      <div className="relative z-10 max-w-[1380px] mx-auto px-4 sm:px-8 md:px-10 lg:px-12 pt-16 sm:pt-16 lg:pt-20">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Column: Headline, Narrative, Metrics & CTA - Pure Intrinsic Contrast, Zero Wrapping Badges */}
           <div data-reveal="about-text" className="lg:col-span-6 space-y-4 sm:space-y-4.5">
