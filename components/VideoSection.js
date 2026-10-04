@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react";
 
 export default function VideoSection() {
   const [hasScrolledIntoView, setHasScrolledIntoView] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const sectionRef = useRef(null);
   const iframeRef = useRef(null);
   const videoId = "EFeYBR4UegI";
@@ -18,7 +17,8 @@ export default function VideoSection() {
         }
       },
       {
-        threshold: 0.25, // Automatically triggers when 25% of the section is in view
+        threshold: 0.1, // Triggers as soon as 10% enters
+        rootMargin: "0px 0px 80px 0px", // Pre-loads and starts playing before fully in view
       }
     );
 
@@ -29,57 +29,56 @@ export default function VideoSection() {
     return () => observer.disconnect();
   }, []);
 
-  // Tự động gửi lệnh unmute khi người dùng có thao tác click hoặc touch trên trang
+  const unmutedRef = useRef(false);
+
+  // Tự động mở tiếng khi người dùng cuộn tới video hoặc có tương tác đầu tiên
   useEffect(() => {
     if (!hasScrolledIntoView) return;
 
-    const sendUnmute = () => {
+    const tryUnmute = () => {
+      if (unmutedRef.current) return;
       try {
-        iframeRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ event: "command", func: "unMute", args: [] }),
-          "*"
-        );
-        iframeRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ event: "command", func: "setVolume", args: [100] }),
-          "*"
-        );
-        setIsMuted(false);
+        const win = iframeRef.current?.contentWindow;
+        if (!win) return;
+        win.postMessage(JSON.stringify({ event: "command", func: "unMute", args: [] }), "*");
+        win.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [100] }), "*");
+        unmutedRef.current = true;
       } catch (err) {}
     };
 
-    // Thử gửi lệnh mở tiếng
-    sendUnmute();
+    // Thử gửi lệnh mở tiếng theo các khoảng thời gian tải iframe
+    const timers = [
+      setTimeout(tryUnmute, 200),
+      setTimeout(tryUnmute, 600),
+      setTimeout(tryUnmute, 1200),
+      setTimeout(tryUnmute, 2200),
+    ];
 
-    window.addEventListener("click", sendUnmute, { once: true });
-    window.addEventListener("touchstart", sendUnmute, { once: true });
+    // Lắng nghe tương tác đầu tiên (cuộn, chạm, click) để kích hoạt âm thanh mà không can thiệp nút dừng/tua của video
+    const handleFirstTouch = () => {
+      tryUnmute();
+      cleanup();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener("scroll", handleFirstTouch);
+      window.removeEventListener("wheel", handleFirstTouch);
+      window.removeEventListener("touchstart", handleFirstTouch);
+      window.removeEventListener("pointerdown", handleFirstTouch);
+      window.removeEventListener("click", handleFirstTouch);
+    };
+
+    window.addEventListener("scroll", handleFirstTouch, { passive: true, once: true });
+    window.addEventListener("wheel", handleFirstTouch, { passive: true, once: true });
+    window.addEventListener("touchstart", handleFirstTouch, { passive: true, once: true });
+    window.addEventListener("pointerdown", handleFirstTouch, { passive: true, once: true });
+    window.addEventListener("click", handleFirstTouch, { once: true });
 
     return () => {
-      window.removeEventListener("click", sendUnmute);
-      window.removeEventListener("touchstart", sendUnmute);
+      timers.forEach((t) => clearTimeout(t));
+      cleanup();
     };
   }, [hasScrolledIntoView]);
-
-  const handleToggleSound = () => {
-    try {
-      if (isMuted) {
-        iframeRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ event: "command", func: "unMute", args: [] }),
-          "*"
-        );
-        iframeRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ event: "command", func: "setVolume", args: [100] }),
-          "*"
-        );
-        setIsMuted(false);
-      } else {
-        iframeRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ event: "command", func: "mute", args: [] }),
-          "*"
-        );
-        setIsMuted(true);
-      }
-    } catch (err) {}
-  };
 
   return (
     <section
@@ -153,24 +152,24 @@ export default function VideoSection() {
             <div className="relative w-full h-full">
               <iframe
                 ref={iframeRef}
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&loop=1&playlist=${videoId}&playsinline=1&rel=0&controls=1&modestbranding=1`}
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&rel=0&playsinline=1&enablejsapi=1`}
                 title="Welcome to Bản Mường Xanh"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
+                onLoad={() => {
+                  try {
+                    iframeRef.current?.contentWindow?.postMessage(
+                      JSON.stringify({ event: "command", func: "unMute", args: [] }),
+                      "*"
+                    );
+                    iframeRef.current?.contentWindow?.postMessage(
+                      JSON.stringify({ event: "command", func: "setVolume", args: [100] }),
+                      "*"
+                    );
+                  } catch (e) {}
+                }}
                 className="w-full h-full border-0 block"
               />
-
-              {/* Nút bấm nhanh Bật âm thanh nếu trình duyệt yêu cầu tương tác */}
-              {isMuted && (
-                <button
-                  type="button"
-                  onClick={handleToggleSound}
-                  className="absolute bottom-12 left-4 sm:bottom-14 sm:left-6 z-20 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A6E43] hover:bg-[#208351] text-white text-xs sm:text-sm font-bold shadow-2xl border border-white/40 backdrop-blur-md transition-all transform hover:scale-105 cursor-pointer animate-pulse select-none"
-                >
-                  <span className="text-base">🔊</span>
-                  <span>Bấm để bật âm thanh</span>
-                </button>
-              )}
             </div>
           ) : (
             <div className="relative w-full h-full">
