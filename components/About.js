@@ -94,7 +94,7 @@ export default function About({ onOpenLightbox }) {
             </p>
 
             {/* 3 Metrics with responsive layout and intrinsic contrast */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-3 border-t border-[#082212]/30 max-w-lg">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-3 max-w-lg">
               {/* Metric 1 */}
               <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3 text-center sm:text-left">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/80 flex items-center justify-center flex-shrink-0 text-[#092B17] bg-white shadow-md">
