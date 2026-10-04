@@ -1,30 +1,405 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary-dark: #122B1E;
+  --color-primary-green: #183D2C;
+  --color-primary-light: #2A5A43;
+  --color-parchment: #F7F4EC;
+  --color-parchment-light: #FAF8F2;
+  --color-parchment-dark: #ECE5D5;
+  --color-gold: #C5A059;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-script: var(--font-script), cursive;
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --color-forest: #122B1E;
+  --color-forest-deep: #0D2117;
+  --color-moss: #183D2C;
+  --color-moss-light: #25543D;
+  --color-parchment: #F7F4EC;
+  --color-parchment-card: #FFFFFF;
+  --color-gold-accent: #C5A059;
 }
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior-x: none;
 }
+
+body {
+  font-family: var(--font-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #F7F4EC;
+  color: #222222;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+/* Hide scrollbar utility for clean popup scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Hide Next.js dev indicator badge in bottom-left */
+nextjs-portal,
+[data-nextjs-toast],
+[data-next-badge],
+div[data-nextjs-dialog-overlay] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.font-serif {
+  font-family: var(--font-playfair), Georgia, "Times New Roman", serif;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+.font-sans {
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+}
+
+/* Washi tape realism */
+.washi-tape {
+  background: rgba(240, 234, 218, 0.85);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
+  position: relative;
+}
+
+.washi-tape::before,
+.washi-tape::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-size: 4px 6px;
+  background-repeat: repeat-y;
+}
+
+/* Polaroid photo aesthetic */
+.polaroid-card {
+  background-color: #ffffff;
+  padding: 10px 10px 18px 10px;
+  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.14), 0 4px 8px -2px rgba(0, 0, 0, 0.08);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.polaroid-card:hover {
+  transform: translateY(-5px) scale(1.02) !important;
+  box-shadow: 0 20px 32px -8px rgba(0, 0, 0, 0.22);
+}
+
+/* Parchment / kraft paper background effect */
+.bg-parchment {
+  background-color: #F7F4EC;
+}
+
+.bg-parchment-texture {
+  background-color: #F7F4EC;
+  background-image: radial-gradient(rgba(18, 43, 30, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Golden dotted journey line */
+.gold-dotted-line {
+  background-image: linear-gradient(to right, #C5A059 40%, rgba(255, 255, 255, 0) 0%);
+  background-position: top;
+  background-size: 10px 2px;
+  background-repeat: repeat-x;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F4EC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #183D2C;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #122B1E;
+}
+
+@keyframes slideProgress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ==========================================================================
+   SCROLL-DRIVEN REVEAL ANIMATIONS (BIDIRECTIONAL SCROLL-REVEAL SYSTEM)
+   Tailored, bespoke luxury animations per section for Bản Mường Xanh
+   ========================================================================== */
+
+[data-reveal] {
+  transition-property: transform, opacity, filter;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+}
+
+/* 1. Hero Section Animations */
+[data-reveal="hero-text"] {
+  opacity: 0;
+  transform: translateY(40px);
+  filter: blur(4px);
+  transition-duration: 900ms;
+}
+[data-reveal="hero-text"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+[data-reveal="hero-crescent"] {
+  opacity: 0;
+  transform: translateX(45px);
+  filter: blur(3px);
+  transition-duration: 850ms;
+}
+[data-reveal="hero-crescent"].is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+/* 2. About Section Animations - Botanical Harmony */
+[data-reveal="about-text"] {
+  opacity: 0;
+  transform: translateY(42px);
+  transition-duration: 850ms;
+}
+[data-reveal="about-text"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="about-card"] {
+  opacity: 0;
+  transform: translateY(48px) scale(0.92);
+  transition-duration: 850ms;
+}
+[data-reveal="about-card"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* 3. Experience Section Animations - Nature Unfolding */
+[data-reveal="exp-header"] {
+  opacity: 0;
+  transform: translateY(-28px);
+  transition-duration: 800ms;
+}
+[data-reveal="exp-header"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="exp-pebble"] {
+  opacity: 0;
+  transform: scale(0.78) translateY(38px);
+  filter: brightness(0.8);
+  transition-duration: 750ms;
+}
+[data-reveal="exp-pebble"].is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: brightness(1);
+}
+
+/* 4. Video Section Animations - Cinematic Focal Expand */
+[data-reveal="video-header"] {
+  opacity: 0;
+  transform: translateY(30px);
+  transition-duration: 800ms;
+}
+[data-reveal="video-header"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="video-cinema"] {
+  opacity: 0;
+  transform: scale(0.9) translateY(42px);
+  filter: blur(5px);
+  transition-duration: 950ms;
+}
+[data-reveal="video-cinema"].is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+}
+
+/* 5. Tours Section Animations - 3D Lift & Elevation */
+[data-reveal="tour-header"] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition-duration: 800ms;
+}
+[data-reveal="tour-header"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="tour-card-1"] {
+  opacity: 0;
+  transform: translateY(55px) rotate(-2.5deg) scale(0.93);
+  transition-duration: 900ms;
+}
+[data-reveal="tour-card-1"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg) scale(1);
+}
+
+[data-reveal="tour-card-2"] {
+  opacity: 0;
+  transform: translateY(55px) rotate(2.5deg) scale(0.93);
+  transition-duration: 900ms;
+}
+[data-reveal="tour-card-2"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg) scale(1);
+}
+
+/* 6. Schedule Section Animations - Flowing Stream Timeline */
+[data-reveal="schedule-header"] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition-duration: 800ms;
+}
+[data-reveal="schedule-header"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="schedule-step"] {
+  opacity: 0;
+  transform: translateY(42px) scale(0.88);
+  transition-duration: 800ms;
+}
+[data-reveal="schedule-step"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* 7. Why Choose Section Animations - Heritage Badges */
+[data-reveal="why-header"] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition-duration: 800ms;
+}
+[data-reveal="why-header"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="why-card"] {
+  opacity: 0;
+  transform: translateY(44px) scale(0.92);
+  transition-duration: 850ms;
+}
+[data-reveal="why-card"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* 8. Gallery Section Animations - Curated Mosaic */
+[data-reveal="gallery-header"] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition-duration: 800ms;
+}
+[data-reveal="gallery-header"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="gallery-card"] {
+  opacity: 0;
+  transform: scale(0.85) translateY(42px);
+  transition-duration: 850ms;
+}
+[data-reveal="gallery-card"].is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* 9. FAQ Section Animations - Accordion Soft Cascade */
+[data-reveal="faq-header"] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition-duration: 800ms;
+}
+[data-reveal="faq-header"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="faq-card"] {
+  opacity: 0;
+  transform: translateY(38px);
+  transition-duration: 800ms;
+}
+[data-reveal="faq-card"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 10. Footer Section Animations - Warm Sanctuary Landing */
+[data-reveal="footer-card"] {
+  opacity: 0;
+  transform: translateY(50px) scale(0.94);
+  transition-duration: 900ms;
+}
+[data-reveal="footer-card"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+[data-reveal="footer-bottom"] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition-duration: 750ms;
+}
+[data-reveal="footer-bottom"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Custom styling for date input calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(33%) sepia(50%) saturate(830%) hue-rotate(98deg) brightness(85%) contrast(95%);
+  opacity: 0.85;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+

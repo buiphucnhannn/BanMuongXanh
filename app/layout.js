@@ -1,26 +1,40 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Playfair_Display, Dancing_Script, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const playfair = Playfair_Display({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-playfair",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const dancingScript = Dancing_Script({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-script",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-jakarta",
+  display: "swap",
 });
 
 export const metadata = {
-  title: "Bản Mường Xanh – Homestay & Du lịch cộng đồng",
+  title: "BẢN MƯỜNG XANH | Thiên nhiên • Trải nghiệm • Kết nối ",
   description:
-    "Landing page Bản Mường Xanh – Homestay, ẩm thực dân tộc, trải nghiệm văn hóa. Built with Next.js + TailwindCSS + JavaScript.",
+    "Rời phố, tìm về Bản Mường Xanh – Homestay & du lịch trải nghiệm văn hóa Mường độc đáo tại Lương Sơn, Hòa Bình. Chỉ cách Hà Nội 56km.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}>
-      <body className="min-h-full flex flex-col bg-white text-zinc-900">{children}</body>
+    <html
+      lang="vi"
+      className={`${playfair.variable} ${dancingScript.variable} ${jakarta.variable} h-full scroll-smooth antialiased`}
+    >
+      <body className="min-h-full flex flex-col font-sans bg-[#F7F4EC] text-[#222222]">
+        {children}
+      </body>
     </html>
   );
 }
